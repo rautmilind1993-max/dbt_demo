@@ -1,10 +1,9 @@
-name: snowflake_dbt_project
+name: my_project
 version: 1.0
 config-version: 2
 
-profile: snowflake_profile
+profile: my_profile
 
-# File paths
 model-paths: ["models"]
 seed-paths: ["seeds"]
 test-paths: ["tests"]
@@ -12,89 +11,10 @@ analysis-paths: ["analysis"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-# Clean targets
 clean-targets:
   - "target"
   - "dbt_packages"
 
-# Install packages directory
-packages-install-path: "dbt_packages"
-
-# dbt behavior flags
-flags:
-  send_anonymous_usage_stats: false
-  use_colors: true
-
-# Logging (optional but useful in prod)
-query-comment:
-  comment: "dbt run for {{ target.name }} environment"
-  append: true
-
-# Model configurations
 models:
-  snowflake_dbt_project:
-
-    # Default config (applies to all models)
-    +materialized: incremental
-    +incremental_strategy: merge
-    +on_schema_change: sync_all_columns
-    +persist_docs:
-      relation: true
-      columns: true
-
-    # Layer-based structure (recommended)
-    staging:
-      +materialized: view
-      +schema: stg
-
-    intermediate:
-      +materialized: table
-      +schema: int
-
-    marts:
-      +materialized: table
-      +schema: mart
-
-# Seeds configuration
-seeds:
-  snowflake_dbt_project:
-    +schema: seed_data
-    +quote_columns: false
-
-# Snapshots (for SCD Type 2)
-snapshots:
-  snowflake_dbt_project:
-    +target_schema: snapshot
-    +strategy: timestamp
-    +updated_at: updated_at
-
-# Tests
-data_tests:
-  +store_failures: true
-  +schema: test_failures
-
-# Variables (used in models/macros)
-vars:
-  load_type: "incremental"
-  timezone: "UTC"
-
-# Hooks (useful for audit/logging)
-on-run-start:
-  - "ALTER SESSION SET TIMEZONE = 'UTC'"
-
-on-run-end:
-  - "CALL log_dbt_run_results()"
-
-# Dispatch (for package overrides)
-dispatch:
-  - macro_namespace: dbt
-    search_order: ['snowflake_dbt_project', 'dbt']
-
-# Quoting (important for Snowflake)
-quoting:
-  database: false
-  schema: false
-  identifier: false
-
-# Access control (optional)
-restrict-access: false
+  my_project:
+    +materialized: view
