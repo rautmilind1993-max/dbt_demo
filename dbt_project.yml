@@ -1,80 +1,100 @@
-name: string
-
+name: snowflake_dbt_project
+version: 1.0
 config-version: 2
-version: version
 
-profile: profilename
+profile: snowflake_profile
 
-model-paths: [directorypath]
-seed-paths: [directorypath]
-test-paths: [directorypath]
-analysis-paths: [directorypath]
-macro-paths: [directorypath]
-snapshot-paths: [directorypath]
-docs-paths: [directorypath]
-asset-paths: [directorypath]
-function-paths: [directorypath]
+# File paths
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+analysis-paths: ["analysis"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
 
-packages-install-path: directorypath
+# Clean targets
+clean-targets:
+  - "target"
+  - "dbt_packages"
 
-clean-targets: [directorypath]
+# Install packages directory
+packages-install-path: "dbt_packages"
 
-query-comment: string
-
-require-dbt-version: version-range | [version-range]
-
+# dbt behavior flags
 flags:
-  <global-configs>
+  send_anonymous_usage_stats: false
+  use_colors: true
 
-dbt-cloud:
-  project-id: project_id # Required
-  defer-env-id: environment_id # Optional
-  account-host: account-host # Defaults to 'cloud.getdbt.com'; Required if use a different Access URL
+# Logging (optional but useful in prod)
+query-comment:
+  comment: "dbt run for {{ target.name }} environment"
+  append: true
 
-exposures:
-  +enabled: true | false
-
-quoting:
-  database: true | false
-  schema: true | false
-  identifier: true | false
-  snowflake_ignore_case: true | false  # Fusion-only config. Aligns with Snowflake's session parameter QUOTED_IDENTIFIERS_IGNORE_CASE behavior. 
-                                       # Ignored by dbt Core and other adapters.
-metrics:
-  <metric-configs>
-
+# Model configurations
 models:
-  <model-configs>
+  snowflake_dbt_project:
 
+    # Default config (applies to all models)
+    +materialized: incremental
+    +incremental_strategy: merge
+    +on_schema_change: sync_all_columns
+    +persist_docs:
+      relation: true
+      columns: true
+
+    # Layer-based structure (recommended)
+    staging:
+      +materialized: view
+      +schema: stg
+
+    intermediate:
+      +materialized: table
+      +schema: int
+
+    marts:
+      +materialized: table
+      +schema: mart
+
+# Seeds configuration
 seeds:
-  <seed-configs>
+  snowflake_dbt_project:
+    +schema: seed_data
+    +quote_columns: false
 
-semantic-models:
-  <semantic-model-configs>
-
-saved-queries:
-  <saved-queries-configs>
-
+# Snapshots (for SCD Type 2)
 snapshots:
-  <snapshot-configs>
+  snowflake_dbt_project:
+    +target_schema: snapshot
+    +strategy: timestamp
+    +updated_at: updated_at
 
-sources:
-  <source-configs>
-  
+# Tests
 data_tests:
-  <test-configs>
+  +store_failures: true
+  +schema: test_failures
 
+# Variables (used in models/macros)
 vars:
-  <variables>
+  load_type: "incremental"
+  timezone: "UTC"
 
-on-run-start: sql-statement | [sql-statement]
-on-run-end: sql-statement | [sql-statement]
+# Hooks (useful for audit/logging)
+on-run-start:
+  - "ALTER SESSION SET TIMEZONE = 'UTC'"
 
+on-run-end:
+  - "CALL log_dbt_run_results()"
+
+# Dispatch (for package overrides)
 dispatch:
-  - macro_namespace: packagename
-    search_order: [packagename]
+  - macro_namespace: dbt
+    search_order: ['snowflake_dbt_project', 'dbt']
 
-restrict-access: true | false
+# Quoting (important for Snowflake)
+quoting:
+  database: false
+  schema: false
+  identifier: false
 
-functions:
-  <function-configs>
+# Access control (optional)
+restrict-access: false
