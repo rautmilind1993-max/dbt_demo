@@ -1,71 +1,80 @@
-# Rename this project! Project names should contain only lowercase characters
-# and underscores. A good package name should reflect your organization's
-# name or the intended use of these models
-name: 'my_snowflake_dbt_project'
-version: '1.0.0'
+name: string
+
 config-version: 2
+version: version
 
-# This setting configures which "profile" dbt uses for this project. 
-# In dbt Cloud IDE, this field is unused.
-profile: 'snowflake_demo_project'
+profile: profilename
 
-# These configurations specify where dbt should look for different types of files.
-# The `source-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You don't need to change these for this project.
-source-paths: ["models"]
-analysis-paths: ["analysis"]
-test-paths: ["tests"]
-data-paths: ["data"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
+model-paths: [directorypath]
+seed-paths: [directorypath]
+test-paths: [directorypath]
+analysis-paths: [directorypath]
+macro-paths: [directorypath]
+snapshot-paths: [directorypath]
+docs-paths: [directorypath]
+asset-paths: [directorypath]
+function-paths: [directorypath]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
-    - "target"
-    - "dbt_modules"
+packages-install-path: directorypath
 
-# on-run-start and on-run-end are SQL statement(s) or macros that run at the end of 
-# dbt run/dbt/seed/dbt snapshot commands. 
-# Full documentation: https://docs.getdbt.com/reference/project-configs/on-run-start-on-run-end
-on-run-end:
-  - "{{ grant_all_on_schemas(schemas, 'public') }}"
+clean-targets: [directorypath]
 
-# Configuring seeds 
-# Full documentation: https://docs.getdbt.com/docs/building-a-dbt-project/seeds
-seeds:
-# This declares that column names in the seed file will not be quoted when the table is created.
-  +quote_columns: false
+query-comment: string
 
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
+require-dbt-version: version-range | [version-range]
 
-# In this config, we tell dbt how to build the models, where to build them, which warehouse 
-# to use, and what query tag to provide on the snowflake site. 
-# These settings can be overridden in the individual model files
-# using the `{{ config(...) }}` macro. 
+flags:
+  <global-configs>
+
+dbt-cloud:
+  project-id: project_id # Required
+  defer-env-id: environment_id # Optional
+  account-host: account-host # Defaults to 'cloud.getdbt.com'; Required if use a different Access URL
+
+exposures:
+  +enabled: true | false
+
+quoting:
+  database: true | false
+  schema: true | false
+  identifier: true | false
+  snowflake_ignore_case: true | false  # Fusion-only config. Aligns with Snowflake's session parameter QUOTED_IDENTIFIERS_IGNORE_CASE behavior. 
+                                       # Ignored by dbt Core and other adapters.
+metrics:
+  <metric-configs>
+
 models:
-  my_snowflake_dbt_project:
-    # When you rename the project up top, remember to rename it here too. 
-      staging:
-          # Applies to all files under models/staging 
-          +materialized: view
-          # This defaults every model in the staging directory to be materialized as a view in Snowflake. To learn more about materializations: https://docs.getdbt.com/docs/building-a-dbt-project/building-models/materializations
-          schema: staging
-          # This configuration builds every model in the staging directory into a schema named staging_<target_schema>
-          # learn more about custom schemas: https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-custom-schemas
-          query_tag: dbt_staging
-          # This applies a query tag named `dbt_staging` to any related queries in Snowflake's Query_History
-          # learn more about query tags: https://docs.getdbt.com/reference/resource-configs/snowflake-configs#query-tags
-          snowflake_warehouse: compute_wh
-          # This specifies which Snowflake warehouse should be used to execute models in staging by overriding the default warehouse defined in the connection.
-          # learn more about configuring warehouses: https://docs.getdbt.com/reference/resource-configs/snowflake-configs#configuring-virtual-warehouses
-          tags: "daily"
-          # You can apply tags to models, snapshots, seeds. This allows you to run based on the tag such as `dbt run --model tag:daily` which would let you run all the models tagged "daily"
-          # learn more about tags: https://docs.getdbt.com/reference/resource-configs/tags#definition
-      marts:
-        core:
-         # Applies to all files under models/marts/core
-          +materialized: table
-          # This defaults every model in the marts/core directory to be materialized as a table in Snowflake
-          query_tag: dbt_marts   
-          # This applies a query tag named `dbt_marts` to any related queries in Snowflake's Query_History       
+  <model-configs>
+
+seeds:
+  <seed-configs>
+
+semantic-models:
+  <semantic-model-configs>
+
+saved-queries:
+  <saved-queries-configs>
+
+snapshots:
+  <snapshot-configs>
+
+sources:
+  <source-configs>
+  
+data_tests:
+  <test-configs>
+
+vars:
+  <variables>
+
+on-run-start: sql-statement | [sql-statement]
+on-run-end: sql-statement | [sql-statement]
+
+dispatch:
+  - macro_namespace: packagename
+    search_order: [packagename]
+
+restrict-access: true | false
+
+functions:
+  <function-configs>
