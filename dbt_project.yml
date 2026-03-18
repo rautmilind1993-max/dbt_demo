@@ -17,4 +17,8 @@ clean-targets:
 
 models:
   my_project:
+<<<<<<< HEAD
     +materialized: view
+=======
+    +materialized: view
+>>>>>>> 975c20ffbfa0b7c3f387d23fa56a36d471a0db31
