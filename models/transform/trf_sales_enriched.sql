@@ -46,7 +46,7 @@ LEFT JOIN {{ ref('stg_stores') }} st
 {% if is_incremental() %}
 
 WHERE s.created_at > (
-    SELECT MAX(t.created_at)
+    SELECT DATEADD(hour, -2, MAX(t.created_at))
     FROM {{ this }} t
 )
 
