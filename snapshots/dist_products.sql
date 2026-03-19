@@ -3,8 +3,14 @@
 {{
     config(
         unique_key='product_id',
-        strategy='timestamp',
-        updated_at='updated_at'
+        strategy='check',
+        check_cols=[
+            'product_name',
+            'category',
+            'sub_category',
+            'brand',
+            'unit_cost'
+        ]
     )
 }}
 
