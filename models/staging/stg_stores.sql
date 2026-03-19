@@ -1,3 +1,4 @@
+{{ config(materialized='view') }}
 WITH source_data AS (
     SELECT
         CAST(STORE_ID AS NUMBER)                 AS store_id,
@@ -13,7 +14,7 @@ deduplicated AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY store_id
-            ORDER BY updated_at DESC NULLS LAST
+            ORDER BY updated_at DESC NULLS LAST, created_at DESC
         ) AS rn
     FROM source_data
 )
