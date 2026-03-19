@@ -28,11 +28,11 @@ models:
     
     staging:
       +materialized: incremental
-      +schema: STG
+      +schema: STAGING
       
     transform:
       +materialized: incremental
-      +schema: STG
+      +schema: INT
       
 
   
