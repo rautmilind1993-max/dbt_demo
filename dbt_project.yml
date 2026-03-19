@@ -8,7 +8,7 @@ profile: snowflake_profile
 model-paths: ["models"]
 seed-paths: ["seeds"]
 test-paths: ["tests"]
-analysis-paths: ["analysis"]
+analysis-paths: ["analyses"] 
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -20,63 +20,70 @@ clean-targets:
 models:
   my_project:
 
-    # STAGING LAYER (raw → cleaned)
+    # LANDING (optional - usually sources, but keeping as per your structure)
+    landing:
+      +materialized: view
+      +schema: LANDING
+
+    # STAGING LAYER (cleaned data)
     staging:
       +materialized: view
-      +schema: stg
+      +schema: STG
 
-    # DIMENSIONS (SCD1 tables)
-    dimensions:
-      +materialized: incremental
-      +incremental_strategy: merge
-      +schema: mart
+    # MART LAYER (dimensions + facts)
+    mart:
+      +schema: MART
 
-      dim_customers:
-        +unique_key: customer_id
+      # Dimensions
+      dimensions:
+        +materialized: incremental
+        +incremental_strategy: merge
 
-      dim_products:
-        +unique_key: product_id
+        dim_customers:
+          +unique_key: customer_id
 
-      dim_stores:
-        +unique_key: store_id
+        dim_products:
+          +unique_key: product_id
 
-      dim_date:
-        +materialized: table   # static table (no incremental needed)
+        dim_stores:
+          +unique_key: store_id
 
-    # FACT TABLE
-    facts:
-      +materialized: incremental
-      +incremental_strategy: merge
-      +schema: mart
+        dim_date:
+          +materialized: table   # static
 
-      fact_orders:
-        +unique_key: order_id
+      # Facts
+      facts:
+        +materialized: incremental
+        +incremental_strategy: merge
 
-# Seeds (if you load CSVs later)
+        fact_orders:
+          +unique_key: order_id
+
+# Seeds
 seeds:
   my_project:
-    +schema: seed_data
+    +schema: SEED_DATA
 
-# Snapshots (optional for SCD2 later)
+# Snapshots
 snapshots:
   my_project:
-    +target_schema: snapshot
+    +target_schema: SNAPSHOT
 
 # Tests
 data_tests:
   +store_failures: true
-  +schema: test_failures
+  +schema: TEST_FAILURES
 
 # Variables
 vars:
   load_type: "incremental"
   timezone: "UTC"
 
-# Hooks (optional logging)
+# Hooks
 on-run-start:
   - "ALTER SESSION SET TIMEZONE = 'UTC'"
 
-# Quoting (Snowflake best practice)
+# Quoting
 quoting:
   database: false
   schema: false
