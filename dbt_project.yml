@@ -29,6 +29,7 @@ models:
     dimensions:
       +materialized: incremental
       +incremental_strategy: merge
+      +schema: mart
 
       dim_customers:
         +unique_key: customer_id
@@ -46,6 +47,7 @@ models:
     facts:
       +materialized: incremental
       +incremental_strategy: merge
+      +schema: mart
 
       fact_orders:
         +unique_key: order_id
