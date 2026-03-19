@@ -17,3 +17,5 @@ sources:
 
       - name: DATE
         description: "Date dimension source table"
+
+      - name: FCT_SALES
