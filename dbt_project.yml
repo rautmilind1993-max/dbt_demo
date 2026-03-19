@@ -20,21 +20,26 @@ clean-targets:
 models:
   my_project:
 
-    # LANDING (optional - usually sources, but keeping as per your structure)
+    
     landing:
       +materialized: view
       +schema: LANDING
 
-    # STAGING LAYER (cleaned data)
+    
     staging:
-      +materialized: view
+      +materialized: incremental
       +schema: STG
+      
+    transform:
+      +materialized: incremental
+      +schema: STG
+      
 
-    # MART LAYER (dimensions + facts)
+  
     mart:
       +schema: MART
 
-      # Dimensions
+     
       dimensions:
         +materialized: view
         +incremental_strategy: merge
@@ -51,7 +56,7 @@ models:
         dim_date:
           +materialized: table   # static
 
-      # Facts
+     
       facts:
         +materialized: view
         +incremental_strategy: merge
@@ -59,31 +64,31 @@ models:
         fact_orders:
           +unique_key: order_id
 
-# Seeds
+
 seeds:
   my_project:
     +schema: SEED_DATA
 
-# Snapshots
+
 snapshots:
   my_project:
     +target_schema: SNAPSHOT
 
-# Tests
+
 data_tests:
   +store_failures: true
   +schema: TEST_FAILURES
 
-# Variables
+
 vars:
   load_type: "incremental"
   timezone: "UTC"
 
-# Hooks
+
 on-run-start:
   - "ALTER SESSION SET TIMEZONE = 'UTC'"
 
-# Quoting
+
 quoting:
   database: false
   schema: false
