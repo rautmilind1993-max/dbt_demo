@@ -1,3 +1,11 @@
+{{ 
+    config(
+        materialized = 'incremental',
+        unique_key = 'order_id',
+        incremental_strategy = 'merge'
+    ) 
+}}
+
 SELECT
     s.order_id,
     s.order_date,
@@ -8,6 +16,7 @@ SELECT
     s.unit_price,
     s.discount,
     s.payment_type,
+    s.created_at,
     c.customer_name,
     c.gender,
     c.city AS customer_city,
@@ -33,3 +42,17 @@ LEFT JOIN {{ ref('stg_products') }} p
 
 LEFT JOIN {{ ref('stg_stores') }} st
     ON s.store_id = st.store_id
+
+{% if is_incremental() %}
+
+WHERE s.created_at > (
+    SELECT MAX(t.created_at)
+    FROM {{ this }} t
+)
+
+{% endif %}
+
+QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY s.order_id
+    ORDER BY s.created_at DESC
+) = 1
