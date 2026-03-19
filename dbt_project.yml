@@ -2,8 +2,9 @@ name: my_project
 version: 1.0
 config-version: 2
 
-profile: my_profile
+profile: snowflake_profile
 
+# Paths
 model-paths: ["models"]
 seed-paths: ["seeds"]
 test-paths: ["tests"]
@@ -15,6 +16,66 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Models configuration
 models:
   my_project:
-    +materialized: view
+
+    # STAGING LAYER (raw → cleaned)
+    staging:
+      +materialized: view
+      +schema: stg
+
+    # DIMENSIONS (SCD1 tables)
+    dimensions:
+      +materialized: incremental
+      +incremental_strategy: merge
+
+      dim_customers:
+        +unique_key: customer_id
+
+      dim_products:
+        +unique_key: product_id
+
+      dim_stores:
+        +unique_key: store_id
+
+      dim_date:
+        +materialized: table   # static table (no incremental needed)
+
+    # FACT TABLE
+    facts:
+      +materialized: incremental
+      +incremental_strategy: merge
+
+      fact_orders:
+        +unique_key: order_id
+
+# Seeds (if you load CSVs later)
+seeds:
+  my_project:
+    +schema: seed_data
+
+# Snapshots (optional for SCD2 later)
+snapshots:
+  my_project:
+    +target_schema: snapshot
+
+# Tests
+data_tests:
+  +store_failures: true
+  +schema: test_failures
+
+# Variables
+vars:
+  load_type: "incremental"
+  timezone: "UTC"
+
+# Hooks (optional logging)
+on-run-start:
+  - "ALTER SESSION SET TIMEZONE = 'UTC'"
+
+# Quoting (Snowflake best practice)
+quoting:
+  database: false
+  schema: false
+  identifier: false
