@@ -44,11 +44,6 @@ models:
         +materialized: view
         +incremental_strategy: merge
 
-        dim_customers:
-          +unique_key: customer_id
-
-        dim_products:
-          +unique_key: product_id
 
         dim_stores:
           +unique_key: store_id
