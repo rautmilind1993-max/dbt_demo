@@ -20,12 +20,6 @@ clean-targets:
 models:
   my_project:
 
-    
-    landing:
-      +materialized: view
-      +schema: LANDING
-
-    
     staging:
       +materialized: incremental
       +schema: STAGING
@@ -33,16 +27,9 @@ models:
     transform:
       +materialized: incremental
       +schema: INT
-      
-
   
     mart:
       +schema: MART
-
-     
-      facts:
-        +materialized: view
-        +incremental_strategy: merge
 
 snapshots:
   my_project:
