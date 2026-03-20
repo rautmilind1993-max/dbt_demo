@@ -1,3 +1,5 @@
+{{ config(materialized='view') }}
+
 WITH source_data AS (
     SELECT
         CAST(PRODUCT_ID AS NUMBER)              AS product_id,
