@@ -16,7 +16,9 @@ deduplicated AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY product_id
-            ORDER BY updated_at DESC NULLS LAST
+            ORDER BY updated_at DESC NULLS LAST,
+            created_at DESC,
+            product_name DESC 
         ) AS rn
     FROM source_data
 )
