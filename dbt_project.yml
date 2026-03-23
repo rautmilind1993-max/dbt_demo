@@ -21,7 +21,7 @@ models:
   my_project:
 
     staging:
-      +materialized: incremental
+      +materialized: view
       +schema: STAGING
       
     transform:
