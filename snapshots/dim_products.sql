@@ -1,4 +1,4 @@
-{% snapshot dist_products %}
+{% snapshot dim_products %}
 
 {{
     config(

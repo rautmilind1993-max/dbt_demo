@@ -1,4 +1,4 @@
-{% snapshot dist_customers %}
+{% snapshot dim_customers %}
 
 {{
     config(
