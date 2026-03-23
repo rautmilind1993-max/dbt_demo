@@ -33,7 +33,7 @@ models:
 
 snapshots:
   my_project:
-    +target_schema: MART
+    +target_schema: SNAPSHOT
 
 
 vars:
